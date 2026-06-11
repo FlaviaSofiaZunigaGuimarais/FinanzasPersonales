@@ -88,6 +88,14 @@ class HomeFragment : Fragment() {
 
                 val saldoTotal = totalIngresos - totalGastos
                 adapter.notifyDataSetChanged()
+                if (listaMovimientos.isEmpty()) {
+                    binding.tvEmpty.visibility = View.VISIBLE
+                    binding.rvMovimientos.visibility = View.GONE
+                    binding.pieChart.visibility = View.GONE
+                } else {
+                    binding.tvEmpty.visibility = View.GONE
+                    binding.rvMovimientos.visibility = View.VISIBLE
+                }
                 binding.tvSaldo.text = "Saldo total: $${"%.2f".format(saldoTotal)}"
 
                 actualizarGrafica(totalIngresos, totalGastos)
