@@ -45,6 +45,7 @@ class HomeFragment : Fragment() {
                 putString("categoria", movimiento.categoria)
                 putString("fecha", movimiento.fecha)
                 putString("descripcion", movimiento.descripcion)
+                putString("id", movimiento.id)
             }
             findNavController().navigate(R.id.action_home_to_detalle, bundle)
         }
