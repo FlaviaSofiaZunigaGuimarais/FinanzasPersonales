@@ -1,5 +1,6 @@
 package com.app.finanzaspersonales
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,6 +9,9 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.app.finanzaspersonales.databinding.FragmentHomeBinding
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -72,16 +76,48 @@ class HomeFragment : Fragment() {
             .get()
             .addOnSuccessListener { result ->
                 listaMovimientos.clear()
-                var saldoTotal = 0.0
+                var totalIngresos = 0.0
+                var totalGastos = 0.0
+
                 for (doc in result) {
                     val movimiento = doc.toObject(Movimiento::class.java).copy(id = doc.id)
                     listaMovimientos.add(movimiento)
-                    if (movimiento.tipo == "Ingreso") saldoTotal += movimiento.monto
-                    else saldoTotal -= movimiento.monto
+                    if (movimiento.tipo == "Ingreso") totalIngresos += movimiento.monto
+                    else totalGastos += movimiento.monto
                 }
+
+                val saldoTotal = totalIngresos - totalGastos
                 adapter.notifyDataSetChanged()
                 binding.tvSaldo.text = "Saldo total: $${"%.2f".format(saldoTotal)}"
+
+                actualizarGrafica(totalIngresos, totalGastos)
             }
+    }
+
+    private fun actualizarGrafica(ingresos: Double, gastos: Double) {
+        if (ingresos == 0.0 && gastos == 0.0) {
+            binding.pieChart.visibility = View.GONE
+            return
+        }
+
+        val entries = mutableListOf<PieEntry>()
+        if (ingresos > 0) entries.add(PieEntry(ingresos.toFloat(), "Ingresos"))
+        if (gastos > 0) entries.add(PieEntry(gastos.toFloat(), "Gastos"))
+
+        val dataSet = PieDataSet(entries, "")
+        dataSet.colors = listOf(Color.parseColor("#4CAF50"), Color.parseColor("#F44336"))
+        dataSet.valueTextSize = 12f
+        dataSet.valueTextColor = Color.WHITE
+
+        val data = PieData(dataSet)
+        binding.pieChart.data = data
+        binding.pieChart.description.isEnabled = false
+        binding.pieChart.isDrawHoleEnabled = true
+        binding.pieChart.holeRadius = 40f
+        binding.pieChart.setHoleColor(Color.TRANSPARENT)
+        binding.pieChart.legend.isEnabled = true
+        binding.pieChart.animateY(800)
+        binding.pieChart.invalidate()
     }
 
     override fun onDestroyView() {
