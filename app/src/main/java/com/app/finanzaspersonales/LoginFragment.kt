@@ -29,7 +29,6 @@ class LoginFragment : Fragment() {
 
         auth = FirebaseAuth.getInstance()
 
-        // Si ya hay sesión activa, ir directo al Home
         if (auth.currentUser != null) {
             findNavController().navigate(R.id.action_login_to_home)
             return
@@ -39,7 +38,6 @@ class LoginFragment : Fragment() {
             val correo = binding.tilCorreo.editText?.text.toString().trim()
             val contrasena = binding.tilContrasena.editText?.text.toString().trim()
 
-            // Validaciones
             if (correo.isEmpty()) {
                 binding.tilCorreo.error = "Ingresa tu correo"
                 return@setOnClickListener
@@ -49,6 +47,37 @@ class LoginFragment : Fragment() {
                 return@setOnClickListener
             }
             binding.tilCorreo.error = null
+
+            if (contrasena.isEmpty()) {
+                binding.tilContrasena.error = "Ingresa tu contraseña"
+                return@setOnClickListener
+            }
+            if (contrasena.length < 6) {
+                binding.tilContrasena.error = "Mínimo 6 caracteres"
+                return@setOnClickListener
+            }
+            binding.tilContrasena.error = null
+
+            auth.signInWithEmailAndPassword(correo, contrasena)
+                .addOnSuccessListener {
+                    findNavController().navigate(R.id.action_login_to_home)
+                }
+                .addOnFailureListener {
+                    Toast.makeText(requireContext(), "Correo o contraseña incorrectos", Toast.LENGTH_SHORT).show()
+                }
         }
+
+        binding.tvRegistrarse.setOnClickListener {
+            findNavController().navigate(R.id.action_login_to_register)
+        }
+
+        binding.tvRestablecer.setOnClickListener {
+            findNavController().navigate(R.id.action_login_to_forgot)
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
