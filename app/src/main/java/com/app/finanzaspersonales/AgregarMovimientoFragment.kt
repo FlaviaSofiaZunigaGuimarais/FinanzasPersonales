@@ -5,17 +5,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.app.finanzaspersonales.databinding.FragmentPersonalInfoBinding
+import com.app.finanzaspersonales.databinding.FragmentAgregarMovimientoBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import java.util.Calendar
 
-class PersonalInfoFragment : Fragment() {
+class AgregarMovimientoFragment : Fragment() {
 
-    private var _binding: FragmentPersonalInfoBinding? = null
+    private var _binding: FragmentAgregarMovimientoBinding? = null
     private val binding get() = _binding!!
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
@@ -24,7 +25,7 @@ class PersonalInfoFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentPersonalInfoBinding.inflate(inflater, container, false)
+        _binding = FragmentAgregarMovimientoBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -34,7 +35,15 @@ class PersonalInfoFragment : Fragment() {
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
 
-        // DatePicker para fecha de nacimiento
+        val tipos = listOf("Ingreso", "Gasto")
+        val tipoAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, tipos)
+        binding.acTipo.setAdapter(tipoAdapter)
+
+        val categorias = listOf("Comida", "Transporte", "Entretenimiento", "Salud", "Educación", "Ropa", "Servicios", "Otros")
+        val categoriaAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, categorias)
+        binding.acCategoria.setAdapter(categoriaAdapter)
+
+        // DatePicker para fecha
         binding.tilFecha.editText?.setOnClickListener {
             val calendar = Calendar.getInstance()
             val year = calendar.get(Calendar.YEAR)
@@ -50,58 +59,54 @@ class PersonalInfoFragment : Fragment() {
             datePicker.show()
         }
 
-        binding.btnContinuar.setOnClickListener {
-            val nombre = binding.tilNombre.editText?.text.toString().trim()
-            val apellidos = binding.tilApellidos.editText?.text.toString().trim()
-            val usuario = binding.tilUsuario.editText?.text.toString().trim()
-            val telefono = binding.tilTelefono.editText?.text.toString().trim()
+        binding.btnGuardar.setOnClickListener {
+            val tipo = binding.acTipo.text.toString().trim()
+            val montoStr = binding.tilMonto.editText?.text.toString().trim()
+            val categoria = binding.acCategoria.text.toString().trim()
             val fecha = binding.tilFecha.editText?.text.toString().trim()
+            val descripcion = binding.tilDescripcion.editText?.text.toString().trim()
 
-            if (nombre.isEmpty()) {
-                binding.tilNombre.error = "Ingresa tu nombre"
+            if (tipo.isEmpty()) {
+                binding.tilTipo.error = "Selecciona el tipo"
                 return@setOnClickListener
             }
-            binding.tilNombre.error = null
+            binding.tilTipo.error = null
 
-            if (apellidos.isEmpty()) {
-                binding.tilApellidos.error = "Ingresa tus apellidos"
+            if (montoStr.isEmpty()) {
+                binding.tilMonto.error = "Ingresa el monto"
                 return@setOnClickListener
             }
-            binding.tilApellidos.error = null
+            binding.tilMonto.error = null
 
-            if (usuario.isEmpty()) {
-                binding.tilUsuario.error = "Ingresa un nombre de usuario"
+            if (categoria.isEmpty()) {
+                binding.tilCategoria.error = "Selecciona una categoría"
                 return@setOnClickListener
             }
-            binding.tilUsuario.error = null
-
-            if (telefono.isEmpty() || telefono.length < 10) {
-                binding.tilTelefono.error = "Ingresa un teléfono válido"
-                return@setOnClickListener
-            }
-            binding.tilTelefono.error = null
+            binding.tilCategoria.error = null
 
             if (fecha.isEmpty()) {
-                binding.tilFecha.error = "Ingresa tu fecha de nacimiento"
+                binding.tilFecha.error = "Ingresa la fecha"
                 return@setOnClickListener
             }
             binding.tilFecha.error = null
 
+            val monto = montoStr.toDoubleOrNull() ?: 0.0
             val uid = auth.currentUser?.uid ?: return@setOnClickListener
-            val usuarioData = hashMapOf(
-                "nombre" to nombre,
-                "apellidos" to apellidos,
-                "usuario" to usuario,
-                "telefono" to telefono,
-                "fechaNacimiento" to fecha,
-                "correo" to (auth.currentUser?.email ?: "")
+
+            val movimiento = hashMapOf(
+                "tipo" to tipo,
+                "monto" to monto,
+                "categoria" to categoria,
+                "fecha" to fecha,
+                "descripcion" to descripcion
             )
 
             db.collection("usuarios").document(uid)
-                .set(usuarioData)
+                .collection("movimientos")
+                .add(movimiento)
                 .addOnSuccessListener {
-                    Toast.makeText(requireContext(), "Perfil guardado", Toast.LENGTH_SHORT).show()
-                    findNavController().navigate(R.id.action_personalInfo_to_home)
+                    Toast.makeText(requireContext(), "Movimiento guardado", Toast.LENGTH_SHORT).show()
+                    findNavController().popBackStack()
                 }
                 .addOnFailureListener {
                     Toast.makeText(requireContext(), "Error: ${it.message}", Toast.LENGTH_SHORT).show()

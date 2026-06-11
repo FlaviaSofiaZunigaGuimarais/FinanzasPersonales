@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/loginFragment">
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.app.finanzaspersonales.LoginFragment"
+        android:label="Login" >
+        <action
+            android:id="@+id/action_login_to_register"
+            app:destination="@id/registerFragment"/>
+        <action
+            android:id="@+id/action_login_to_forgot"
+            app:destination="@id/forgotPasswordFragment"/>
+        <action
+            android:id="@+id/action_login_to_home"
+            app:destination="@id/homeFragment"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/registerFragment"
+        android:name="com.app.finanzaspersonales.RegisterFragment"
+        android:label="Register">
+        <action
+            android:id="@+id/action_register_to_personalInfo"
+            app:destination="@id/personalInfoFragment"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/personalInfoFragment"
+        android:name="com.app.finanzaspersonales.PersonalInfoFragment"
+        android:label="Personal Info">
+        <action
+            android:id="@+id/action_personalInfo_to_home"
+            app:destination="@id/homeFragment"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/forgotPasswordFragment"
+        android:name="com.app.finanzaspersonales.ForgotPasswordFragment"
+        android:label="Forgot Password">
+        <action
+            android:id="@+id/action_forgot_to_login"
+            app:destination="@id/loginFragment"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.app.finanzaspersonales.HomeFragment"
+        android:label="Home">
+        <action
+            android:id="@+id/action_home_to_detalle"
+            app:destination="@id/detalleFragment"/>
+        <action
+            android:id="@+id/action_home_to_cuenta"
+            app:destination="@id/cuentaFragment"/>
+        <action
+            android:id="@+id/action_home_to_agregar"
+            app:destination="@id/agregarMovimientoFragment"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/detalleFragment"
+        android:name="com.app.finanzaspersonales.DetalleFragment"
+        android:label="Detalle"/>
+
+    <fragment
+        android:id="@+id/cuentaFragment"
+        android:name="com.app.finanzaspersonales.CuentaFragment"
+        android:label="Cuenta"/>
+
+    <fragment
+        android:id="@+id/agregarMovimientoFragment"
+        android:name="com.app.finanzaspersonales.AgregarMovimientoFragment"
+        android:label="Agregar Movimiento"/>
+
+</navigation>
