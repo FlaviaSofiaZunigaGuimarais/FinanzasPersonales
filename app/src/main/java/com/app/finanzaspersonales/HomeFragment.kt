@@ -45,5 +45,47 @@ class HomeFragment : Fragment() {
             findNavController().navigate(R.id.action_home_to_detalle, bundle)
         }
         binding.rvMovimientos.layoutManager = LinearLayoutManager(requireContext())
+        binding.rvMovimientos.adapter = adapter
+
+        val uid = auth.currentUser?.uid ?: return
+
+        db.collection("usuarios").document(uid).get()
+            .addOnSuccessListener { doc ->
+                val nombre = doc.getString("nombre") ?: "Usuario"
+                binding.tvBienvenidoHome.text = "Hola, $nombre"
+            }
+
+        binding.fabAgregar.setOnClickListener {
+            findNavController().navigate(R.id.action_home_to_agregar)
+        }
+
+        binding.btnCuenta.setOnClickListener {
+            findNavController().navigate(R.id.action_home_to_cuenta)
+        }
+
+        cargarMovimientos(uid)
+    }
+
+    private fun cargarMovimientos(uid: String) {
+        db.collection("usuarios").document(uid)
+            .collection("movimientos")
+            .get()
+            .addOnSuccessListener { result ->
+                listaMovimientos.clear()
+                var saldoTotal = 0.0
+                for (doc in result) {
+                    val movimiento = doc.toObject(Movimiento::class.java).copy(id = doc.id)
+                    listaMovimientos.add(movimiento)
+                    if (movimiento.tipo == "Ingreso") saldoTotal += movimiento.monto
+                    else saldoTotal -= movimiento.monto
+                }
+                adapter.notifyDataSetChanged()
+                binding.tvSaldo.text = "Saldo total: $${"%.2f".format(saldoTotal)}"
+            }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
