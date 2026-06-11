@@ -68,4 +68,13 @@
         android:name="com.app.finanzaspersonales.CuentaFragment"
         android:label="Cuenta"/>
 
+    <fragment
+        android:id="@+id/agregarMovimientoFragment"
+        android:name="com.app.finanzaspersonales.AgregarMovimientoFragment"
+        android:label="Agregar Movimiento">
+        <action
+            android:id="@+id/action_home_to_agregar"
+            app:destination="@id/agregarMovimientoFragment"/>
+    </fragment>
+
 </navigation>
