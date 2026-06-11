@@ -56,6 +56,9 @@
         <action
             android:id="@+id/action_home_to_cuenta"
             app:destination="@id/cuentaFragment"/>
+        <action
+            android:id="@+id/action_home_to_agregar"
+            app:destination="@id/agregarMovimientoFragment"/>
     </fragment>
 
     <fragment
@@ -71,10 +74,6 @@
     <fragment
         android:id="@+id/agregarMovimientoFragment"
         android:name="com.app.finanzaspersonales.AgregarMovimientoFragment"
-        android:label="Agregar Movimiento">
-        <action
-            android:id="@+id/action_home_to_agregar"
-            app:destination="@id/agregarMovimientoFragment"/>
-    </fragment>
+        android:label="Agregar Movimiento"/>
 
 </navigation>
