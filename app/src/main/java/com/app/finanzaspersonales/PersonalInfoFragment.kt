@@ -41,10 +41,13 @@ class PersonalInfoFragment : Fragment() {
             val month = calendar.get(Calendar.MONTH)
             val day = calendar.get(Calendar.DAY_OF_MONTH)
 
-            DatePickerDialog(requireContext(), { _, y, m, d ->
+            val datePicker = DatePickerDialog(requireContext(), { _, y, m, d ->
                 val fecha = "%02d/%02d/%04d".format(d, m + 1, y)
                 binding.tilFecha.editText?.setText(fecha)
-            }, year, month, day).show()
+            }, year, month, day)
+
+            datePicker.datePicker.maxDate = System.currentTimeMillis()
+            datePicker.show()
         }
 
         binding.btnContinuar.setOnClickListener {
